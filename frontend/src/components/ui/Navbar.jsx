@@ -1,0 +1,103 @@
+import { Link, useNavigate } from "react-router-dom"
+import { useAuth } from "@/hooks/useAuth"
+import { useApi } from "@/hooks/useApi"
+import toast from "react-hot-toast"
+import { useState } from "react"
+import { MdLogout } from "react-icons/md"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+    DropdownMenuItem,
+    DropdownMenuGroup,
+} from "@/components/ui/Dropdown"
+import { SidebarTrigger } from "@/components/ui/Sidebar"
+import ThemeToggle from "@/components/ui/ThemeToggle"
+
+export default function Navbar() {
+    const [loggingOut, setLoggingOut] = useState(false);
+    const navigate = useNavigate();
+    const { isAuthenticated, user, setUser, authToken, setAuthToken } = useAuth();
+    const api = useApi()
+
+    const handleLogout = async () => {
+        setLoggingOut(true);
+        try {
+            const { data, error } = await api.post("/api/logout", {}, {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            });
+
+            if (error) {
+                toast.error(error.message);
+            } else {
+                setUser({});
+                setAuthToken("");
+                toast.success("Logged out");
+            }
+        } catch (err) {
+            toast.error("Something went wrong.");
+        } finally {
+            setLoggingOut(false);
+        }
+    };
+
+    return (
+        <div className="bg-base-100">
+            <div className="flex items-center px-4 h-16 gap-2 border-b border-base-content/20">
+                <div className="lg:tooltip lg:tooltip-right">
+                    <kbd className="kbd hidden lg:block tooltip-content">ctrl + /</kbd>
+                    <SidebarTrigger />
+                </div>
+                <Link className="flex items-center justify-center gap-1 text-accent" to="/">
+                    <img
+                        src="/logo.svg"
+                        className="size-8"
+                    />
+                </Link>
+                <div className="flex-1"></div>
+                <ThemeToggle />
+                <div className="flex-none">
+                    {isAuthenticated ? (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger className="outline-none rounded-full">
+                                <div className="avatar ring-2 ring-accent rounded-full cursor-pointer">
+                                    <div className="size-10 rounded-full">
+                                        <img src={user.avatar} />
+                                    </div>
+                                </div>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-52">
+                                <DropdownMenuLabel>
+                                    <h2>{user.name}</h2>
+                                    <p className="text-xs text-base-content/60">{user.email}</p>
+                                </DropdownMenuLabel>
+                                <div className="my-2"></div>
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem onClick={() => navigate("/pricing")}>
+                                        <span>Subscription</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+                                    {loggingOut ? <span className="loading loading-spinner"></span> : (
+                                        <>
+                                            <MdLogout /> Logout
+                                        </>
+                                    )}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    ) : (
+                        <button className="btn btn-accent" onClick={() => navigate("/login")}>
+                            Get Started
+                        </button>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
