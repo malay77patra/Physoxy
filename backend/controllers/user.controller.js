@@ -1,7 +1,6 @@
 require("dotenv").config();
 const User = require("@/db/models/user");
 const Package = require("@/db/models/package");
-const Subscription = require("@/db/models/subscription");
 const jwt = require("jsonwebtoken");
 
 // Get packages

@@ -35,6 +35,11 @@ const userSchema = new Schema(
         refreshToken: {
             type: String,
         },
+        subscription: {
+            type: Schema.Types.ObjectId,
+            ref: "Package",
+            default: null,
+        },
     },
     { timestamps: true }
 );

@@ -1,4 +1,5 @@
 const Package = require("@/db/models/package");
+const User = require("@/db/models/user");
 const { packageSchema } = require("@/utils/validations");
 
 const addPackage = async (req, res) => {
@@ -36,13 +37,32 @@ const addPackage = async (req, res) => {
 
 const deletePackage = async (req, res) => {
     const { id } = req.params;
-    const deletedPackage = await Package.findByIdAndDelete(id);
-    if (!deletedPackage) {
+    const deleteablePackage = await Package.findById(id);
+    if (!deleteablePackage) {
         return res.status(404).json({
             message: "Package not found",
             details: "package with this id does not exist"
         });
     }
+
+    const now = new Date();
+    const users = await User.find({ subscription: id })
+        .populate({
+            path: 'subscription',
+            match: { endsAt: { $gt: now } }
+        });
+    const subscribedUsers = users.filter(user => user.subscription !== null);
+    console.log(subscribedUsers)
+
+    if (subscribedUsers.length > 0) {
+        return res.status(403).json({
+            message: "Package is in use and cannot be deleted",
+            details: "package is in use by some users"
+        });
+    }
+
+    const deletedPackage = await Package.findByIdAndDelete(id);
+
     return res.status(200).json(deletedPackage);
 }
 

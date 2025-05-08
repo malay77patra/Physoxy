@@ -216,7 +216,7 @@ function Package({ handleDelete, ...pkg }) {
                 }
             })
             if (error) {
-                toast.error("Something went wrong!")
+                toast.error(error.message)
             } else {
                 handleDelete(pkg._id)
                 toast.success("Deleted!")
