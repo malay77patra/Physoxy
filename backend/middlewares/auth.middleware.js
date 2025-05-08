@@ -53,6 +53,18 @@ const verifyAccessToken = async (req, res, next) => {
     }
 };
 
+const verifyAdmin = async (req, res, next) => {
+    if (req.user?.role !== "admin") {
+        return res.status(403).json({
+            message: "Forbidden network request.",
+            details: "user is not an admin"
+        });
+    }
+
+    next();
+}
+
 module.exports = {
     verifyAccessToken,
+    verifyAdmin,
 };

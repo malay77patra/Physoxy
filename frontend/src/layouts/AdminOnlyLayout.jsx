@@ -2,18 +2,18 @@ import { Outlet, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 
-export default function AuthorizedLayout() {
-    const { isAuthenticated } = useAuth()
+export default function AdminOnlyLayout() {
+    const { user } = useAuth()
     const navigate = useNavigate()
     const [checked, setChecked] = useState(false)
 
     useEffect(() => {
-        if (isAuthenticated === false) {
-            navigate("/login", { replace: true })
-        } else if (isAuthenticated === true) {
+        if (user?.role !== 'admin') {
+            navigate(-1, { replace: true })
+        } else {
             setChecked(true)
         }
-    }, [isAuthenticated])
+    }, [user])
 
     if (!checked) return null
 

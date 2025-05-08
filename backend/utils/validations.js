@@ -1,4 +1,24 @@
-const { object, string } = require("yup");
+const { object, string, number } = require("yup");
+
+const packageSchema = object({
+    name: string()
+        .trim()
+        .required("Package name is required")
+        .matches(/^[A-Za-z]+$/, "Package name must contain only letters (no spaces or symbols)"),
+    description: string()
+        .trim()
+        .required("Description is required")
+        .min(10, "Description must be at least 10 characters")
+        .max(200, "Description must be less than 200 characters"),
+    pricing: object({
+        monthly: number()
+            .required("Monthly price is required")
+            .min(0, "Monthly price must be a positive number"),
+        yearly: number()
+            .required("Yearly price is required")
+            .min(0, "Yearly price must be a positive number")
+    }).required("Pricing is required")
+}).strict().required();
 
 const loginSchema = object({
     email: string()
@@ -39,5 +59,6 @@ const registerSchema = object({
 
 module.exports = {
     loginSchema,
-    registerSchema
+    registerSchema,
+    packageSchema
 };

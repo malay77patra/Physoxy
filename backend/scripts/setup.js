@@ -1,25 +1,25 @@
 const User = require("@/db/models/user");
 
-const setupOwner = async () => {
-    const ownerEmail = process.env.OWNER_EMAIL;
-    console.log("Configuring owner email...");
+const setupAdmin = async () => {
+    const AdminEmail = process.env.ADMIN_EMAIL;
+    console.log("Configuring admin email...");
 
-    if (!ownerEmail) {
-        console.error("❌ Owner email is not found in environment variables.");
+    if (!AdminEmail) {
+        console.error("❌ Admin email is not found in environment variables.");
         return;
     }
 
-    const owner = await User.findOne({ email: ownerEmail });
+    const admin = await User.findOne({ email: AdminEmail });
 
-    if (!owner) {
-        console.error("❌ No user found with the owner email.");
+    if (!admin) {
+        console.error("❌ No user found with the admin email.");
         return;
     }
 
-    owner.role = "owner";
-    await owner.save();
+    admin.role = "admin";
+    await admin.save();
 
-    console.log(`✅ Owner email confihuration complete.`);
+    console.log(`✅ Admin email confihuration complete.`);
 };
 
-module.exports = setupOwner;
+module.exports = setupAdmin;

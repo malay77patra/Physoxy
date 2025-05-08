@@ -1,6 +1,16 @@
 require("dotenv").config();
 const User = require("@/db/models/user");
+const Package = require("@/db/models/package");
+const Subscription = require("@/db/models/subscription");
 const jwt = require("jsonwebtoken");
+
+// Get packages
+
+const getAllPackages = async (req, res) => {
+    const packages = await Package.find();
+
+    return res.status(200).json(packages);
+}
 
 // Refresh user
 
@@ -67,4 +77,4 @@ const refreshAccessToken = async (req, res) => {
     }
 };
 
-module.exports = { refreshAccessToken };
+module.exports = { refreshAccessToken, getAllPackages };

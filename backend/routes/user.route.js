@@ -1,11 +1,12 @@
 const { Router } = require("express");
-const { refreshAccessToken } = require("@/controllers/user.controller");
+const { refreshAccessToken, getAllPackages } = require("@/controllers/user.controller");
 
 const router = Router();
 
 // ---------------------- Public Routes ----------------------
 
 router.post("/refresh", refreshAccessToken);
+router.get("/package/all", getAllPackages);
 
 // ---------------------- Protected Routes ----------------------
 

@@ -92,7 +92,7 @@ const registerUser = async (req, res) => {
         // Validation error
         if (error.name === "ValidationError") {
             return res.status(400).json({
-                message: error.inner[0]?.message || "Input registration data is invalid.",
+                message: error.errors[0] || "Input registration data is invalid.",
                 details: "provided registration data is invalid"
             });
         }
@@ -142,7 +142,7 @@ const loginUser = async (req, res) => {
             .cookie("refreshToken", refreshToken, REFRESH_TOKEN_OPTIONS)
             .json({
                 message: "Logged in.",
-                user: { id: user._id, name: user.name, email: user.email, avatar: user.avatar },
+                user: { id: user._id, name: user.name, email: user.email, avatar: user.avatar, role: user.role },
                 accessToken,
             });
     } catch (error) {
@@ -150,7 +150,7 @@ const loginUser = async (req, res) => {
         // Validation error
         if (error.name === "ValidationError") {
             return res.status(400).json({
-                message: error.inner[0]?.message || "Input login data is invalid.",
+                message: error.errors[0] || "Input login data is invalid.",
                 details: "provided login data is invalid"
             });
         }

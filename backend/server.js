@@ -5,7 +5,7 @@ const { urlencoded } = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const connectDB = require("@/db/connect");
-const setupOwner = require("@/scripts/setup");
+const setupAdmin = require("@/scripts/setup");
 const routes = require("@/routes");
 const path = require("path");
 const { globalErrorHandler } = require("@/middlewares/error.middleware");
@@ -41,7 +41,7 @@ app.use(globalErrorHandler);
 
 // Starting the server
 connectDB()
-    .then(() => setupOwner())
+    .then(() => setupAdmin())
     .then(() => {
         app.listen(PORT, () => {
             if (isProduction) {

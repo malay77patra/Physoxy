@@ -4,9 +4,10 @@ import Home from '@/pages/Home'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import Dashboard from '@/pages/Dashboard'
+import Pricing from '@/pages/Pricing'
 import DefaultLayout from '@/layouts/DefaultLayout'
 import GoBackLayout from '@/layouts/GoBackLayout'
-import AuthorizedLayout from '@/layouts/AuthorizedLayout'
+import AdminOnlyLayout from '@/layouts/AdminOnlyLayout'
 
 export default function App() {
   return (
@@ -18,8 +19,9 @@ export default function App() {
 
       <Route element={<DefaultLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/pricing" element={<Pricing />} />
 
-        <Route element={<AuthorizedLayout />}>
+        <Route element={<AdminOnlyLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
       </Route>

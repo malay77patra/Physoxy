@@ -7,7 +7,7 @@ import { TbLayoutDashboardFilled } from "react-icons/tb"
 
 export default function DefaultLayout() {
     const navigate = useNavigate()
-    const { isAuthenticated } = useAuth()
+    const { user } = useAuth()
 
     return (
         <SidebarProvider>
@@ -20,12 +20,12 @@ export default function DefaultLayout() {
                         <SidebarMenuItem onClick={() => navigate("/")}>
                             <GoHomeFill /> Home
                         </SidebarMenuItem>
-                        {isAuthenticated && (
+                        {user.role === "admin" && (
                             <>
                                 <CollapsibleSidebarSubMenu items={
                                     <>
                                         <CollapsibleSidebarSubMenuItem onClick={() => navigate("/dashboard")}>Overview</CollapsibleSidebarSubMenuItem>
-                                        <CollapsibleSidebarSubMenuItem onClick={() => navigate("/dashboard?tab=posts")}>Posts</CollapsibleSidebarSubMenuItem>
+                                        <CollapsibleSidebarSubMenuItem onClick={() => navigate("/dashboard?tab=packages")}>Packages</CollapsibleSidebarSubMenuItem>
                                     </>
                                 }>
                                     <TbLayoutDashboardFilled /> Dashboard
