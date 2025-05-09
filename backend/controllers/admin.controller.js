@@ -97,5 +97,16 @@ const updatePackage = async (req, res) => {
     }
 }
 
+const getAllSubscribers = async (req, res) => {
+    const now = Date.now();
+    const subscribers = await User.find({
+        "subscription.endsAt": { $gt: now }
+    })
+        .select('_id email subscription')
+        .populate('subscription.id', 'name');
 
-module.exports = { addPackage, deletePackage, updatePackage };
+    return res.status(200).json(subscribers);
+}
+
+
+module.exports = { addPackage, deletePackage, updatePackage, getAllSubscribers };
