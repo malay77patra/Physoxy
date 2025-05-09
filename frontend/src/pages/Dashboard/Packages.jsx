@@ -2,7 +2,6 @@ import { useApi } from "@/hooks/useApi"
 import toast from "react-hot-toast"
 import { useEffect, useRef, useState } from "react"
 import { FaPlus } from "react-icons/fa"
-import { useAuth } from "@/hooks/useAuth"
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
@@ -40,7 +39,6 @@ export default function Packages() {
     const modalRef = useRef(null)
     const [modalOpen, setModalOpen] = useState(false)
     const [adding, setAdding] = useState(false)
-    const { authToken } = useAuth()
 
     const {
         register,
@@ -54,7 +52,7 @@ export default function Packages() {
     const fetchPackages = async () => {
         setFetching(true)
         try {
-            const { data, error } = await api.get('/api/package/all')
+            const { data, error } = await api.public.get('/api/package/all')
             if (error) {
                 toast.error("Something went wrong!")
             } else {
@@ -70,11 +68,7 @@ export default function Packages() {
     const addpackage = async (data) => {
         setAdding(true)
         try {
-            const { data: newData, error } = await api.post('/api/package/new', data, {
-                headers: {
-                    Authorization: `Bearer ${authToken}`
-                }
-            })
+            const { data: newData, error } = await api.protected.post('/api/package/new', data)
             if (error) {
                 toast.error(error.message)
             } else {
@@ -186,7 +180,6 @@ export default function Packages() {
 function Package({ handleDelete, ...pkg }) {
     const [isEditing, setIsEditing] = useState(false)
     const api = useApi()
-    const { authToken } = useAuth()
     const [deleting, setDeleting] = useState(false)
     const [updating, setUpdating] = useState(false)
 
@@ -194,6 +187,7 @@ function Package({ handleDelete, ...pkg }) {
         register,
         handleSubmit,
         reset,
+        watch,
         formState: { errors }
     } = useForm({
         resolver: yupResolver(pkgSchema),
@@ -210,11 +204,7 @@ function Package({ handleDelete, ...pkg }) {
     const deletePackage = async () => {
         setDeleting(true)
         try {
-            const { data, error } = await api.delete(`/api/package/delete/${pkg._id}`, {
-                headers: {
-                    Authorization: `Bearer ${authToken}`
-                }
-            })
+            const { data, error } = await api.protected.delete(`/api/package/delete/${pkg._id}`)
             if (error) {
                 toast.error(error.message)
             } else {
@@ -231,11 +221,7 @@ function Package({ handleDelete, ...pkg }) {
     const updatePackage = async (formData) => {
         setUpdating(true)
         try {
-            const { data, error } = await api.put(`/api/package/update/${pkg._id}`, formData, {
-                headers: {
-                    Authorization: `Bearer ${authToken}`
-                }
-            })
+            const { data, error } = await api.protected.put(`/api/package/update/${pkg._id}`, formData)
             if (error) {
                 toast.error(error.message)
             } else {
@@ -304,16 +290,16 @@ function Package({ handleDelete, ...pkg }) {
                 </form>
             ) : (
                 <>
-                    <h1 className="card-title text-accent">{pkg.name}</h1>
-                    <p className="mb-4">{pkg.description}</p>
+                    <h1 className="card-title text-accent">{watch("name")}</h1>
+                    <p className="mb-4">{watch("description")}</p>
                     <p className="font-semibold text-secondary">Prices</p>
                     <div className="flex gap-2">
                         <label className="label">Monthly:</label>
-                        <span>${pkg.pricing.monthly}</span>
+                        <span>${watch("pricing.monthly")}</span>
                     </div>
                     <div className="flex gap-2">
                         <label className="label">Yearly:</label>
-                        <span>${pkg.pricing.yearly}</span>
+                        <span>${watch("pricing.yearly")}</span>
                     </div>
                     <div className="card-actions justify-end mt-4">
                         <button className="btn btn-primary flex-1" onClick={() => setIsEditing(true)}>Edit</button>

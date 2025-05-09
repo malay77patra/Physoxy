@@ -62,7 +62,7 @@ export default function Register() {
     const registerUser = async (formData) => {
         setIsLoading(true);
         try {
-            const { data, error } = await api.post("/api/register", formData);
+            const { data, error } = await api.public.post("/api/register", formData);
 
             if (error) {
                 toast.error(error.message);

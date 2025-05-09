@@ -160,6 +160,16 @@ const updragePackage = async (req, res) => {
 
 }
 
+const cancelPackage = async (req, res) => {
+    const user = await User.findById(req.user._id);
+    user.subscription = null;
+    await user.save()
+
+    // Logic to refund user's unused money
+
+    return res.status(200).json({})
+}
+
 const getMyPackage = async (req, res) => {
     const now = new Date();
 
@@ -169,4 +179,4 @@ const getMyPackage = async (req, res) => {
     return res.status(200).json({});
 };
 
-module.exports = { refreshAccessToken, getAllPackages, updragePackage, getMyPackage };
+module.exports = { refreshAccessToken, getAllPackages, updragePackage, getMyPackage, cancelPackage };

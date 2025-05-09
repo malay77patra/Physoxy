@@ -49,7 +49,7 @@ export default function Login() {
     const loginUser = async (formData) => {
         setIsLoading(true);
         try {
-            const { data, error } = await api.post("/api/login", formData, {
+            const { data, error } = await api.public.post("/api/login", formData, {
                 withCredentials: true,
             });
 

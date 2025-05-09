@@ -25,7 +25,7 @@ function Package({ pkg }) {
 }
 
 export default function Pricing() {
-    const { authToken, isAuthenticated } = useAuth()
+    const { isAuthenticated } = useAuth()
     const api = useApi()
     const [pckages, setPackages] = useState([])
     const [myPackage, setMyPackage] = useState({})
@@ -35,7 +35,7 @@ export default function Pricing() {
     const fetchPackages = async () => {
         setLoading(true)
         try {
-            const { data, error } = await api.get("/api/package/all")
+            const { data, error } = await api.public.get("/api/package/all")
             if (error) {
                 toast.error(error.message)
             } else {
@@ -49,11 +49,7 @@ export default function Pricing() {
     }
 
     const fetchMyPackage = async () => {
-        const { data, error } = await api.get("/api/package/my", {
-            headers: {
-                Authorization: `Bearer ${authToken}`,
-            },
-        })
+        const { data, error } = await api.protected.get("/api/package/my")
         if (error) {
             toast.error(error.message)
         } else {
@@ -66,6 +62,14 @@ export default function Pricing() {
         if (isAuthenticated) fetchMyPackage()
     }, [])
 
+    function formatDate(dateStr) {
+        return new Date(dateStr).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+
     return (
         <div>
             {loading ? (
@@ -76,12 +80,15 @@ export default function Pricing() {
                 <div className="flex flex-col items-center justify-center gap-3">
                     <h1 className="text-center text-3xl pb-8 font-bold">Choose Your Plan!</h1>
                     {isAuthenticated && (
-                        <div className="w-100 border p-2 rounded-box mb-4">
+                        <div className="w-64 border p-2 rounded-box mb-4">
                             <h2 className="text-md font-semibold">
                                 <label className="label">Active Plan:</label> <span className="text-primary">{activePackage ? activePackage.name : "FREE"}</span>
                                 {activePackage && (
                                     <>
                                         <p><label className="label">Duration:</label> {myPackage.type}</p>
+                                        <p><label className="label">Amount:</label> ${myPackage.amount}</p>
+                                        <p><label className="label">Started At:</label> {formatDate(myPackage.startsAt)}</p>
+                                        <p><label className="label">Ending At:</label> {formatDate(myPackage.endsAt)}</p>
                                     </>
                                 )}
                             </h2>

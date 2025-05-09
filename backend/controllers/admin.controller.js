@@ -45,12 +45,10 @@ const deletePackage = async (req, res) => {
     }
 
     const now = new Date();
-    const users = await User.find({ subscription: id })
-        .populate({
-            path: 'subscription',
-            match: { endsAt: { $gt: now } }
-        });
-    const subscribedUsers = users.filter(user => user.subscription !== null);
+    const subscribedUsers = await User.find({
+        "subscription.id": id,
+        "subscription.endsAt": { $gt: now }
+    });
 
     if (subscribedUsers.length > 0) {
         return res.status(403).json({

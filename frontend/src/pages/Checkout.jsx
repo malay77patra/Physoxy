@@ -1,5 +1,4 @@
 import { useApi } from "@/hooks/useApi"
-import { useAuth } from "@/hooks/useAuth"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { useParams } from "react-router-dom"
@@ -12,13 +11,12 @@ export default function Checkout() {
     const [loadingMy, setLoadingMy] = useState(true)
     const [isMonthly, setIsMonthly] = useState(true)
     const api = useApi()
-    const { authToken } = useAuth()
     const [upgrading, setUpgrading] = useState(false)
 
     const fetchPackages = async () => {
         setLoadingAll(true)
         try {
-            const { data, error } = await api.get("/api/package/all")
+            const { data, error } = await api.public.get("/api/package/all")
             if (error) {
                 toast.error(error.message)
             } else {
@@ -34,11 +32,7 @@ export default function Checkout() {
     const fetchMyPackage = async () => {
         setLoadingMy(true)
         try {
-            const { data, error } = await api.get("/api/package/my", {
-                headers: {
-                    Authorization: `Bearer ${authToken}`,
-                },
-            })
+            const { data, error } = await api.protected.get("/api/package/my")
             if (error) {
                 toast.error(error.message)
             } else {
@@ -54,12 +48,8 @@ export default function Checkout() {
     const upgradeMyPackage = async () => {
         setUpgrading(true)
         try {
-            const { data, error } = await api.post(`/api/package/upgrade/${id}`, {
+            const { data, error } = await api.protected.post(`/api/package/upgrade/${id}`, {
                 type: isMonthly ? "monthly" : "yearly"
-            }, {
-                headers: {
-                    Authorization: `Bearer ${authToken}`,
-                },
             })
             if (error) {
                 toast.error(error.message)

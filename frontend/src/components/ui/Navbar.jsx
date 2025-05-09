@@ -19,23 +19,18 @@ import ThemeToggle from "@/components/ui/ThemeToggle"
 export default function Navbar() {
     const [loggingOut, setLoggingOut] = useState(false);
     const navigate = useNavigate();
-    const { isAuthenticated, user, setUser, authToken, setAuthToken } = useAuth();
+    const { isAuthenticated, user, setUser, logoutUser } = useAuth();
     const api = useApi()
 
     const handleLogout = async () => {
         setLoggingOut(true);
         try {
-            const { data, error } = await api.post("/api/logout", {}, {
-                headers: {
-                    Authorization: `Bearer ${authToken}`
-                }
-            });
+            const { data, error } = await api.protected.post("/api/logout");
 
             if (error) {
                 toast.error(error.message);
             } else {
-                setUser({});
-                setAuthToken("");
+                logoutUser()
                 toast.success("Logged out");
             }
         } catch (err) {
