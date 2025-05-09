@@ -24,7 +24,6 @@ const addPackage = async (req, res) => {
 
     } catch (error) {
         if (error.name === "ValidationError") {
-            console.log(req.body, error.errors);
             return res.status(400).json({
                 message: error.errors[0] || "Input package data is invalid.",
                 details: "provided package data is invalid"
@@ -52,7 +51,6 @@ const deletePackage = async (req, res) => {
             match: { endsAt: { $gt: now } }
         });
     const subscribedUsers = users.filter(user => user.subscription !== null);
-    console.log(subscribedUsers)
 
     if (subscribedUsers.length > 0) {
         return res.status(403).json({
@@ -91,7 +89,6 @@ const updatePackage = async (req, res) => {
         return res.status(200).json(updatedPackage);
     } catch (error) {
         if (error.name === "ValidationError") {
-            console.log(req.body, error.errors);
             return res.status(400).json({
                 message: error.errors[0] || "Input package data is invalid.",
                 details: "provided package data is invalid"

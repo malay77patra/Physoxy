@@ -36,9 +36,24 @@ const userSchema = new Schema(
             type: String,
         },
         subscription: {
-            type: Schema.Types.ObjectId,
-            ref: "Package",
-            default: null,
+            id: {
+                type: Schema.Types.ObjectId,
+                ref: "Package",
+            },
+            type: {
+                type: String,
+                enum: ["monthly", "yearly"],
+            },
+            amount: {
+                type: Number,
+                min: 0,
+            },
+            startsAt: {
+                type: Date,
+            },
+            endsAt: {
+                type: Date,
+            },
         },
     },
     { timestamps: true }

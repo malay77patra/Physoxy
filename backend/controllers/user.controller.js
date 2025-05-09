@@ -2,6 +2,9 @@ require("dotenv").config();
 const User = require("@/db/models/user");
 const Package = require("@/db/models/package");
 const jwt = require("jsonwebtoken");
+const { Schema, ref } = require("yup");
+const mongoose = require("mongoose");
+const { upgradePlanSchema } = require("@/utils/validations");
 
 // Get packages
 
@@ -76,4 +79,94 @@ const refreshAccessToken = async (req, res) => {
     }
 };
 
-module.exports = { refreshAccessToken, getAllPackages };
+const updragePackage = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const now = Date.now();
+        const validatedData = await upgradePlanSchema.validate(req.body);
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({
+                message: "Invalid package ID",
+                details: "package id is not a valid object id",
+            });
+        }
+
+        const package = await Package.findById(id);
+        if (!package) {
+            return res.status(404).json({
+                message: "Package not found",
+                details: "no package found with the given id",
+            });
+        }
+
+        if (package._id.equals(req.user.subscription.id) && (req.user.subscription.endsAt > now) && (validatedData.type === req.user.subscription.type)) {
+            return res.status(403).json({
+                message: "Already subscribed to this plan!",
+                details: "user is already subscribed to this plan",
+            });
+        }
+
+        let moneyLeft = 0;
+        if (req.user.subscription && req.user.subscription.endsAt > now && req.user.subscription.type === "yearly") {
+            const pricePerMonth = req.user.subscription.amount / 12;
+            const monthsLeft = Math.floor(
+                (req.user.subscription.endsAt - now) / (1000 * 60 * 60 * 24 * 30)
+            );
+            moneyLeft = pricePerMonth * monthsLeft;
+        }
+
+        const packagePrice = validatedData.type === "yearly" ? package.pricing.yearly : package.pricing.monthly;
+        const moneyToBePaid = packagePrice - moneyLeft;
+        const user = await User.findById(req.user._id);
+
+        if (moneyToBePaid >= 0) {
+            // charge money from card, (mock wait)
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            user.subscription = {
+                id: package._id,
+                type: validatedData.type,
+                amount: packagePrice,
+                startsAt: now,
+                endsAt: validatedData.type === "yearly" ? now + 12 * 30 * 24 * 60 * 60 * 1000 : now + 30 * 24 * 60 * 60 * 1000,
+            };
+            const updatedUser = await user.save();
+
+            return res.status(200).json(updatedUser.subscription);
+        }
+
+        // refund money
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        user.subscription = {
+            id: package._id,
+            type: validatedData.type,
+            amount: packagePrice,
+            startsAt: now,
+            endsAt: validatedData.type === "yearly" ? now + 12 * 30 * 24 * 60 * 60 * 1000 : now + 30 * 24 * 60 * 60 * 1000,
+        };
+        const updatedUser = await user.save();
+
+        return res.status(200).json(updatedUser.subscription);
+    } catch (error) {
+        if (error.name === "ValidationError") {
+            return res.status(400).json({
+                message: error.errors[0] || "Invalid package data.",
+                details: "provided package data is invalid"
+            });
+        }
+
+        throw error;
+    }
+
+}
+
+const getMyPackage = async (req, res) => {
+    const now = new Date();
+
+    if (req.user.subscription.endsAt > now) {
+        return res.status(200).json(req.user.subscription);
+    }
+    return res.status(200).json({});
+};
+
+module.exports = { refreshAccessToken, getAllPackages, updragePackage, getMyPackage };

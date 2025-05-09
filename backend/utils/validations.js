@@ -1,5 +1,13 @@
 const { object, string, number } = require("yup");
 
+const upgradePlanSchema = object({
+    // type must be "monthly" or "yearly"
+    type: string()
+        .trim()
+        .required("Subscription type is required")
+        .oneOf(["monthly", "yearly"], "Subscription type must be either monthly or yearly"),
+}).strict().required("Subscription details are required");
+
 const packageSchema = object({
     name: string()
         .trim()
@@ -60,5 +68,6 @@ const registerSchema = object({
 module.exports = {
     loginSchema,
     registerSchema,
-    packageSchema
+    packageSchema,
+    upgradePlanSchema,
 };
