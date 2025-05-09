@@ -1,4 +1,4 @@
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/useTheme"
 
 export default function ThemeToggle() {
     const { theme, setTheme } = useTheme()
@@ -21,5 +21,5 @@ export default function ThemeToggle() {
                 </g>
             </svg>
         </button>
-    );
+    )
 }

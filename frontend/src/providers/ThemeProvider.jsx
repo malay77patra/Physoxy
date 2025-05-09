@@ -10,8 +10,8 @@ const ThemeProvider = ({ children }) => {
         }
 
         // fallback
-        return "lightnew";
-    });
+        return "lightnew"
+    })
 
     useEffect(() => {
         localStorage.setItem("theme", theme)
@@ -23,7 +23,7 @@ const ThemeProvider = ({ children }) => {
         <ThemeContext.Provider value={{ theme, setTheme }}>
             {children}
         </ThemeContext.Provider>
-    );
-};
+    )
+}
 
 export { ThemeContext, ThemeProvider }

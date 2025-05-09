@@ -1,14 +1,13 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { FiMail, FiEye, FiEyeOff } from "react-icons/fi";
-import { LuKeyRound } from "react-icons/lu";
-import { useApi } from "@/hooks/useApi";
-import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import React, { useState } from "react"
+import { useForm } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
+import { FiMail, FiEye, FiEyeOff } from "react-icons/fi"
+import { LuKeyRound } from "react-icons/lu"
+import { useApi } from "@/hooks/useApi"
+import { useNavigate } from "react-router-dom"
+import toast from "react-hot-toast"
+import { Link } from "react-router-dom"
 
 const registerSchema = yup
     .object({
@@ -43,13 +42,13 @@ const registerSchema = yup
             .oneOf([yup.ref("password")], "Passwords must match")
             .required("Confirm password is required"),
     })
-    .required();
+    .required()
 
 export default function Register() {
-    const [isLoading, setIsLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate();
-    const api = useApi();
+    const [isLoading, setIsLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
+    const navigate = useNavigate()
+    const api = useApi()
 
     const {
         register,
@@ -57,30 +56,30 @@ export default function Register() {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(registerSchema),
-    });
+    })
 
     const registerUser = async (formData) => {
-        setIsLoading(true);
+        setIsLoading(true)
         try {
-            const { data, error } = await api.public.post("/api/register", formData);
+            const { data, error } = await api.public.post("/api/register", formData)
 
             if (error) {
-                toast.error(error.message);
+                toast.error(error.message)
             } else {
                 toast.success("A verification link has been sent to your email, please check your inbox.")
                 navigate("/login")
             }
         } catch (err) {
-            console.log("Unexpected error:", err);
-            toast.err("Something went wrong!");
+            console.log("Unexpected error:", err)
+            toast.err("Something went wrong!")
         } finally {
-            setIsLoading(false);
+            setIsLoading(false)
         }
-    };
+    }
 
     const onSubmit = (formData) => {
-        registerUser(formData);
-    };
+        registerUser(formData)
+    }
 
     return (
         <div className="pt-20 flex items-center justify-center">
@@ -183,5 +182,5 @@ export default function Register() {
                 </div>
             </form>
         </div>
-    );
+    )
 }

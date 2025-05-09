@@ -17,28 +17,28 @@ import { SidebarTrigger } from "@/components/ui/Sidebar"
 import ThemeToggle from "@/components/ui/ThemeToggle"
 
 export default function Navbar() {
-    const [loggingOut, setLoggingOut] = useState(false);
-    const navigate = useNavigate();
-    const { isAuthenticated, user, setUser, logoutUser } = useAuth();
+    const [loggingOut, setLoggingOut] = useState(false)
+    const navigate = useNavigate()
+    const { isAuthenticated, user, setUser, logoutUser } = useAuth()
     const api = useApi()
 
     const handleLogout = async () => {
-        setLoggingOut(true);
+        setLoggingOut(true)
         try {
-            const { data, error } = await api.protected.post("/api/logout");
+            const { data, error } = await api.protected.post("/api/logout")
 
             if (error) {
-                toast.error(error.message);
+                toast.error(error.message)
             } else {
                 logoutUser()
-                toast.success("Logged out");
+                toast.success("Logged out")
             }
         } catch (err) {
-            toast.error("Something went wrong.");
+            toast.error("Something went wrong.")
         } finally {
-            setLoggingOut(false);
+            setLoggingOut(false)
         }
-    };
+    }
 
     return (
         <div className="bg-base-100">
@@ -94,5 +94,5 @@ export default function Navbar() {
                 </div>
             </div>
         </div>
-    );
+    )
 }

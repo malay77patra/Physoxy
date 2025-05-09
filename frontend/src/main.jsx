@@ -6,7 +6,7 @@ import { ApiProvider } from '@/providers/ApiProvider'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import '@/styles/main.css'
 import App from '@/App.jsx'
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

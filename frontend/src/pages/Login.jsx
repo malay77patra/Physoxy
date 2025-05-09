@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { FiMail, FiEye, FiEyeOff } from "react-icons/fi";
-import { LuKeyRound } from "react-icons/lu";
-import { useApi } from "@/hooks/useApi";
-import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import React, { useState } from "react"
+import { useForm } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
+import { FiMail, FiEye, FiEyeOff } from "react-icons/fi"
+import { LuKeyRound } from "react-icons/lu"
+import { useApi } from "@/hooks/useApi"
+import { useAuth } from "@/hooks/useAuth"
+import { useNavigate } from "react-router-dom"
+import toast from "react-hot-toast"
+import { Link } from "react-router-dom"
 
 const loginSchema = yup
     .object({
@@ -29,14 +29,14 @@ const loginSchema = yup
                 "Password must contain at least one uppercase letter, one number, and one special character"
             ),
     })
-    .required();
+    .required()
 
 export default function Login() {
-    const [isLoading, setIsLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate();
-    const api = useApi();
-    const { setUser, setAuthToken } = useAuth();
+    const [isLoading, setIsLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
+    const navigate = useNavigate()
+    const api = useApi()
+    const { setUser, setAuthToken } = useAuth()
 
     const {
         register,
@@ -44,34 +44,34 @@ export default function Login() {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(loginSchema),
-    });
+    })
 
     const loginUser = async (formData) => {
-        setIsLoading(true);
+        setIsLoading(true)
         try {
             const { data, error } = await api.public.post("/api/login", formData, {
                 withCredentials: true,
-            });
+            })
 
             if (error) {
-                toast.error(error.message);
+                toast.error(error.message)
             } else {
-                setUser(data.user);
-                setAuthToken(data.accessToken);
-                toast.success("Logged in");
-                navigate("/");
+                setUser(data.user)
+                setAuthToken(data.accessToken)
+                toast.success("Logged in")
+                navigate("/")
             }
         } catch (err) {
-            console.log("Unexpected error:", err);
-            toast.err("Something went wrong!");
+            console.log("Unexpected error:", err)
+            toast.err("Something went wrong!")
         } finally {
-            setIsLoading(false);
+            setIsLoading(false)
         }
-    };
+    }
 
     const onSubmit = (formData) => {
-        loginUser(formData);
-    };
+        loginUser(formData)
+    }
 
     return (
         <div className="pt-20 flex items-center justify-center">
@@ -138,5 +138,5 @@ export default function Login() {
                 </div>
             </form>
         </div>
-    );
+    )
 }

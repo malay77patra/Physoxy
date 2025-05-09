@@ -49,24 +49,24 @@ export function SidebarMenu({ children }) {
 
 
 export function SidebarMenuItem({ children, className, onClick = () => { }, to = "", isExternal = false }) {
-    const navigate = useNavigate();
-    const { toggleSidebar } = useContext(SidebarContext);
+    const navigate = useNavigate()
+    const { toggleSidebar } = useContext(SidebarContext)
 
     const handleClick = (e) => {
-        onClick(e);
-        toggleSidebar();
+        onClick(e)
+        toggleSidebar()
 
         if (to) {
             if (isExternal) {
-                window.location.href = to;
+                window.location.href = to
             } else {
-                navigate(to);
+                navigate(to)
             }
         }
-    };
+    }
 
-    const Wrapper = to ? 'a' : 'div';
-    const wrapperProps = to && isExternal ? { href: to } : {};
+    const Wrapper = to ? 'a' : 'div'
+    const wrapperProps = to && isExternal ? { href: to } : {}
 
     return (
         <li onClick={handleClick}>
@@ -77,7 +77,7 @@ export function SidebarMenuItem({ children, className, onClick = () => { }, to =
                 {children}
             </Wrapper>
         </li>
-    );
+    )
 }
 
 export function CollapsibleSidebarSubMenu({ children, className, items }) {
@@ -101,17 +101,20 @@ export function CollapsibleSidebarSubMenu({ children, className, items }) {
                 </ul>
             )}
         </li>
-    );
+    )
 }
 
 export function CollapsibleSidebarSubMenuItem({ children, className, onClick = () => { } }) {
     const { toggleSidebar } = useContext(SidebarContext)
 
     return (
-        <li className={cn("hover:bg-base-content/5 p-2 rounded-field cursor-pointer flex items-center gap-2", className)} onClick={(e) => { onClick(e); toggleSidebar(); }}>
+        <li className={cn("hover:bg-base-content/5 p-2 rounded-field cursor-pointer flex items-center gap-2", className)} onClick={(e) => {
+            onClick(e)
+            toggleSidebar()
+        }}>
             {children}
         </li>
-    );
+    )
 }
 
 
@@ -148,7 +151,7 @@ export function SidebarTrigger({ iconSize = "1.25rem" }) {
 
 export function Sidebar({ children }) {
     const { isOpen, toggleSidebar } = useContext(SidebarContext)
-    const isMobile = useIsMobile();
+    const isMobile = useIsMobile()
     const [showBackdrop, setShowBackdrop] = useState(false)
     const timeoutRef = useRef(null)
 
@@ -156,7 +159,7 @@ export function Sidebar({ children }) {
         if (!(isOpen && isMobile)) {
             timeoutRef.current = setTimeout(() => {
                 setShowBackdrop(isOpen && isMobile)
-            }, 300);
+            }, 300)
         } else {
             setShowBackdrop(isOpen && isMobile)
         }

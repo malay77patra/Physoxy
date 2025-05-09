@@ -67,7 +67,7 @@ export default function Pricing() {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
-        });
+        })
     }
 
     return (
