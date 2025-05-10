@@ -3,6 +3,7 @@ import Navbar from '@/components/ui/Navbar'
 import { Sidebar, SidebarProvider, SidebarHeader, SidebarFooter, SidebarContent, SidebarMenu, SidebarMenuItem, CollapsibleSidebarSubMenu, CollapsibleSidebarSubMenuItem } from '@/components/ui/Sidebar'
 import { useAuth } from '@/hooks/useAuth'
 import { GoHomeFill } from "react-icons/go"
+import { MdChromeReaderMode } from "react-icons/md"
 import { TbLayoutDashboardFilled } from "react-icons/tb"
 
 export default function DefaultLayout() {
@@ -19,6 +20,9 @@ export default function DefaultLayout() {
                     <SidebarMenu>
                         <SidebarMenuItem onClick={() => navigate("/")}>
                             <GoHomeFill /> Home
+                        </SidebarMenuItem>
+                        <SidebarMenuItem onClick={() => navigate("/blogs")}>
+                            <MdChromeReaderMode /> Blogs
                         </SidebarMenuItem>
                         {isAuthenticated && (user.role === "admin") && (
                             <>

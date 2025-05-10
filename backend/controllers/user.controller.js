@@ -175,6 +175,12 @@ const getMyPackage = async (req, res) => {
 
     if (req.user.subscription.endsAt > now) {
         return res.status(200).json(req.user.subscription);
+    } else {
+        await User.findOneAndUpdate(
+            { _id: req.user._id },
+            { $unset: { subscription: "" } }
+        );
+
     }
     return res.status(200).json({});
 };
@@ -189,6 +195,7 @@ const getAllBlogs = async (req, res) => {
 
 const getBlog = async (req, res) => {
     const { id } = req.params;
+    const now = Date.now();
 
     if (!mongoose.isValidObjectId(id)) {
         return res.status(400).json({
@@ -207,7 +214,7 @@ const getBlog = async (req, res) => {
     }
 
     if (blog.plan) {
-        if (!req.user.subscription) {
+        if (!req.user.subscription || req.user.subscription.endsAt < now) {
             return res.status(200).json({
                 upgrade: true,
                 package: blog.plan,

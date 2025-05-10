@@ -53,7 +53,12 @@ export default function Navbar() {
                         className="size-8"
                     />
                 </Link>
-                <div className="flex-1"></div>
+                <div className="flex-1 flex items-center justify-center ">
+                    <div className="hidden md:flex items-center justify-center gap-3">
+                        <Link to="/" className="hover:underline hover:text-accent font-semibold">HOME</Link>
+                        <Link to="/blogs" className="hover:underline hover:text-accent font-semibold">BLOGS</Link>
+                    </div>
+                </div>
                 <ThemeToggle />
                 <div className="flex-none">
                     {isAuthenticated ? (
