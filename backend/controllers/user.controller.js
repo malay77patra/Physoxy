@@ -195,7 +195,6 @@ const getAllBlogs = async (req, res) => {
 
 const getBlog = async (req, res) => {
     const { id } = req.params;
-    const now = Date.now();
 
     if (!mongoose.isValidObjectId(id)) {
         return res.status(400).json({
@@ -204,43 +203,151 @@ const getBlog = async (req, res) => {
         });
     }
 
-    const blog = await Resource.findById(id)
-        .populate('plan', 'name description pricing.monthly');
+    const blog = await Resource.findById(id).populate('plan', 'name description pricing.monthly');
     if (!blog) {
         return res.status(400).json({
-            message: "Blog not found.",
+            message:
+                "Blog not found.",
             details: "blog not found"
         });
     }
 
-    if (blog.plan) {
-        if (!req.user.subscription || req.user.subscription.endsAt < now) {
-            return res.status(200).json({
-                upgrade: true,
-                package: blog.plan,
-            });
-        }
+    if (req.user.role === "admin" || !blog.plan) {
+        return res.status(200).send(blog);
+    }
 
-        const userPackage = await Package.findById(req.user.subscription.id);
-        if (!userPackage) {
-            return res.status(200).json({
-                upgrade: true,
-                package: blog.plan,
-            });
-        }
+    const now = Date.now();
+    const subscription = req.user.subscription;
 
-        const blogPackagePrice = blog.plan.pricing.monthly;
-        const userPackagePrice = userPackage.pricing.monthly;
+    if (!subscription || subscription.endsAt < now) {
+        return res.status(200).json({
+            upgrade: true,
+            package: blog.plan
+        });
+    }
 
-        if (userPackagePrice < blogPackagePrice) {
-            return res.status(200).json({
-                upgrade: true,
-                package: blog.plan,
-            });
-        }
+    const userPackage = await Package.findById(subscription.id);
+    const userPrice = userPackage?.pricing?.monthly || 0;
+    const blogPrice = blog.plan.pricing.monthly;
+
+    if (userPrice < blogPrice) {
+        return res.status(200).json({
+            upgrade: true,
+            package: blog.plan
+        });
     }
 
     return res.status(200).send(blog);
+};
+
+const getAllEvents = async (req, res) => {
+    const events = await Resource.find({ type: "event" })
+        .select("-content -type")
+        .populate('plan', 'name');
+
+    return res.status(200).json(events);
 }
 
-module.exports = { refreshAccessToken, getAllPackages, updragePackage, getMyPackage, cancelPackage, getAllBlogs, getBlog };
+const getEvent = async (req, res) => {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(400).json({
+            message: "Invalid event ID",
+            details: "invalid event id"
+        });
+    }
+
+    const event = await Resource.findById(id).populate('plan', 'name description pricing.monthly');
+    if (!event) {
+        return res.status(400).json({
+            message: "Event not found.",
+            details: "event not found"
+        });
+    }
+
+    if (req.user.role === "admin" || !event.plan) {
+        return res.status(200).send(event);
+    }
+
+    const now = Date.now();
+    const subscription = req.user.subscription;
+
+    if (!subscription || subscription.endsAt < now) {
+        return res.status(200).json({
+            upgrade: true,
+            package: event.plan
+        });
+    }
+
+    const userPackage = await Package.findById(subscription.id);
+    const userPrice = userPackage?.pricing?.monthly || 0;
+    const eventPrice = event.plan.pricing.monthly;
+
+    if (userPrice < eventPrice) {
+        return res.status(200).json({
+            upgrade: true,
+            package: event.plan
+        });
+    }
+
+    return res.status(200).send(event);
+};
+
+const getAllCourses = async (req, res) => {
+    const courses = await Resource.find({ type: "course" })
+        .select("-content -type")
+        .populate('plan', 'name');
+
+    return res.status(200).json(courses);
+};
+
+const getCourse = async (req, res) => {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(400).json({
+            message: "Invalid course ID",
+            details: "invalid course id"
+        });
+    }
+
+    const course = await Resource.findById(id).populate('plan', 'name description pricing.monthly');
+    if (!course) {
+        return res.status(400).json({
+            message: "Course not found.",
+            details: "course not found"
+        });
+    }
+
+    if (req.user.role === "admin" || !course.plan) {
+        return res.status(200).send(course);
+    }
+
+    const now = Date.now();
+    const subscription = req.user.subscription;
+
+    if (!subscription || subscription.endsAt < now) {
+        return res.status(200).json({
+            upgrade: true,
+            package: course.plan
+        });
+    }
+
+    const userPackage = await Package.findById(subscription.id);
+    const userPrice = userPackage?.pricing?.monthly || 0;
+    const coursePrice = course.plan.pricing.monthly;
+
+    if (userPrice < coursePrice) {
+        return res.status(200).json({
+            upgrade: true,
+            package: course.plan
+        });
+    }
+
+    return res.status(200).send(course);
+};
+
+
+
+module.exports = { refreshAccessToken, getAllPackages, updragePackage, getMyPackage, cancelPackage, getAllBlogs, getBlog, getAllEvents, getEvent, getCourse, getAllCourses };

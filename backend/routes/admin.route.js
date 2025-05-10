@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { deletePackage, addPackage, updatePackage, getAllSubscribers, addNewBlog, deleteBlog } = require("@/controllers/admin.controller");
+const { deletePackage, addPackage, updatePackage, getAllSubscribers, addNewBlog, deleteBlog, addNewEvent, deleteEvent, addNewCourse, deleteCourse } = require("@/controllers/admin.controller");
 const { verifyAccessToken, verifyAdmin } = require("@/middlewares/auth.middleware");
 
 const router = Router();
@@ -13,6 +13,10 @@ router.route("/package/update/:id").put(verifyAccessToken, verifyAdmin, updatePa
 router.route("/package/subscribers").get(verifyAccessToken, verifyAdmin, getAllSubscribers);
 router.route("/blog/new").post(verifyAccessToken, verifyAdmin, addNewBlog);
 router.route("/blog/delete/:id").delete(verifyAccessToken, verifyAdmin, deleteBlog);
+router.route("/event/new").post(verifyAccessToken, verifyAdmin, addNewEvent);
+router.route("/event/delete/:id").delete(verifyAccessToken, verifyAdmin, deleteEvent);
+router.route("/course/new").post(verifyAccessToken, verifyAdmin, addNewCourse);
+router.route("/course/delete/:id").delete(verifyAccessToken, verifyAdmin, deleteCourse);
 
 
 module.exports = router;

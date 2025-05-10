@@ -3,7 +3,9 @@ import Navbar from '@/components/ui/Navbar'
 import { Sidebar, SidebarProvider, SidebarHeader, SidebarFooter, SidebarContent, SidebarMenu, SidebarMenuItem, CollapsibleSidebarSubMenu, CollapsibleSidebarSubMenuItem } from '@/components/ui/Sidebar'
 import { useAuth } from '@/hooks/useAuth'
 import { GoHomeFill } from "react-icons/go"
-import { MdChromeReaderMode } from "react-icons/md"
+import { FaReadme } from "react-icons/fa"
+import { FaUserGraduate } from "react-icons/fa"
+import { MdEvent } from "react-icons/md"
 import { TbLayoutDashboardFilled } from "react-icons/tb"
 
 export default function DefaultLayout() {
@@ -22,7 +24,13 @@ export default function DefaultLayout() {
                             <GoHomeFill /> Home
                         </SidebarMenuItem>
                         <SidebarMenuItem onClick={() => navigate("/blogs")}>
-                            <MdChromeReaderMode /> Blogs
+                            <FaReadme /> Blogs
+                        </SidebarMenuItem>
+                        <SidebarMenuItem onClick={() => navigate("/events")}>
+                            <MdEvent /> Events
+                        </SidebarMenuItem>
+                        <SidebarMenuItem onClick={() => navigate("/courses")}>
+                            <FaUserGraduate /> Courses
                         </SidebarMenuItem>
                         {isAuthenticated && (user.role === "admin") && (
                             <>
@@ -31,6 +39,8 @@ export default function DefaultLayout() {
                                         <CollapsibleSidebarSubMenuItem onClick={() => navigate("/dashboard")}>Overview</CollapsibleSidebarSubMenuItem>
                                         <CollapsibleSidebarSubMenuItem onClick={() => navigate("/dashboard?tab=packages")}>Packages</CollapsibleSidebarSubMenuItem>
                                         <CollapsibleSidebarSubMenuItem onClick={() => navigate("/dashboard?tab=blogs")}>Blogs</CollapsibleSidebarSubMenuItem>
+                                        <CollapsibleSidebarSubMenuItem onClick={() => navigate("/dashboard?tab=events")}>Events</CollapsibleSidebarSubMenuItem>
+                                        <CollapsibleSidebarSubMenuItem onClick={() => navigate("/dashboard?tab=courses")}>Courses</CollapsibleSidebarSubMenuItem>
                                     </>
                                 }>
                                     <TbLayoutDashboardFilled /> Dashboard

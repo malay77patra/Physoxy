@@ -1,7 +1,7 @@
 const Package = require("@/db/models/package");
 const User = require("@/db/models/user");
 const Resource = require("@/db/models/resource");
-const { packageSchema, blogSchema } = require("@/utils/validations");
+const { packageSchema, blogSchema, eventSchema, courseSchema } = require("@/utils/validations");
 const mongoose = require("mongoose");
 
 const addPackage = async (req, res) => {
@@ -172,5 +172,129 @@ const deleteBlog = async (req, res) => {
     return res.status(200).json(deleteBlog);
 }
 
+const addNewEvent = async (req, res) => {
+    let plan;
+    if (req.body.plan) {
+        if (!mongoose.isValidObjectId(req.body.plan)) {
+            return res.status(400).json({
+                message: "Invalid package ID",
+                details: "package id is not valid"
+            });
+        }
 
-module.exports = { addPackage, deletePackage, updatePackage, getAllSubscribers, addNewBlog, deleteBlog };
+        plan = await Package.findById(req.body.plan);
+        if (!plan) {
+            return res.status(404).json({
+                message: "Package not found",
+                details: "package id is not found"
+            });
+        }
+    }
+
+    try {
+        const validatedData = await eventSchema.validate(req.body);
+        const newEvent = await Resource.create({
+            type: "event",
+            title: validatedData.title,
+            content: validatedData.content,
+            plan: req.body.plan ? plan._id : undefined,
+        });
+
+        return res.status(200).json(newEvent);
+    } catch (error) {
+        if (error.name === "ValidationError") {
+            return res.status(400).json({
+                message: error.errors[0] || "Event data is invalid.",
+                details: "provided event data is invalid"
+            });
+        }
+
+        throw error;
+    }
+};
+
+const deleteEvent = async (req, res) => {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(400).json({
+            message: "Invalid event ID",
+            details: "invalid event id"
+        });
+    }
+
+    const deletedEvent = await Resource.findOneAndDelete({ _id: id });
+    if (!deletedEvent) {
+        return res.status(404).json({
+            message: "Event not found",
+            details: "event id is not found"
+        });
+    }
+
+    return res.status(200).json(deletedEvent);
+};
+
+const addNewCourse = async (req, res) => {
+    let plan;
+    if (req.body.plan) {
+        if (!mongoose.isValidObjectId(req.body.plan)) {
+            return res.status(400).json({
+                message: "Invalid package ID",
+                details: "package id is not valid"
+            });
+        }
+
+        plan = await Package.findById(req.body.plan);
+        if (!plan) {
+            return res.status(404).json({
+                message: "Package not found",
+                details: "package id is not found"
+            });
+        }
+    }
+
+    try {
+        const validatedData = await courseSchema.validate(req.body);
+        const newCourse = await Resource.create({
+            type: "course",
+            title: validatedData.title,
+            content: validatedData.content,
+            plan: req.body.plan ? plan._id : undefined,
+        });
+
+        return res.status(200).json(newCourse);
+    } catch (error) {
+        if (error.name === "ValidationError") {
+            return res.status(400).json({
+                message: error.errors[0] || "Course data is invalid.",
+                details: "provided course data is invalid"
+            });
+        }
+
+        throw error;
+    }
+};
+
+const deleteCourse = async (req, res) => {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(400).json({
+            message: "Invalid course ID",
+            details: "invalid course id"
+        });
+    }
+
+    const deletedCourse = await Resource.findOneAndDelete({ _id: id });
+    if (!deletedCourse) {
+        return res.status(404).json({
+            message: "Course not found",
+            details: "course id is not found"
+        });
+    }
+
+    return res.status(200).json(deletedCourse);
+};
+
+
+module.exports = { addPackage, deletePackage, updatePackage, getAllSubscribers, addNewBlog, deleteBlog, addNewEvent, deleteEvent, addNewCourse, deleteCourse };

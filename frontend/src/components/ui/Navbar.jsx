@@ -57,6 +57,8 @@ export default function Navbar() {
                     <div className="hidden md:flex items-center justify-center gap-3">
                         <Link to="/" className="hover:underline hover:text-accent font-semibold">HOME</Link>
                         <Link to="/blogs" className="hover:underline hover:text-accent font-semibold">BLOGS</Link>
+                        <Link to="/events" className="hover:underline hover:text-accent font-semibold">EVENTS</Link>
+                        <Link to="/courses" className="hover:underline hover:text-accent font-semibold">COURSES</Link>
                     </div>
                 </div>
                 <ThemeToggle />
