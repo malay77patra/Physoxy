@@ -110,6 +110,29 @@ const getAllSubscribers = async (req, res) => {
     return res.status(200).json(subscribers);
 }
 
+const getStats = async (req, res) => {
+    const now = Date.now();
+    const numberOfSubscriptions = await User.countDocuments({
+        "subscription.endsAt": { $gt: now }
+    })
+    const numberOfBlogs = await Resource.countDocuments({
+        type: "blog"
+    })
+    const numberOfEvents = await Resource.countDocuments({
+        type: "event"
+    })
+    const numberOfCourses = await Resource.countDocuments({
+        type: "course"
+    })
+
+    return res.status(200).json({
+        subs: numberOfSubscriptions,
+        blogs: numberOfBlogs,
+        events: numberOfEvents,
+        courses: numberOfCourses,
+    });
+}
+
 const addNewBlog = async (req, res) => {
     let plan;
     if (req.body.plan) {
@@ -297,4 +320,4 @@ const deleteCourse = async (req, res) => {
 };
 
 
-module.exports = { addPackage, deletePackage, updatePackage, getAllSubscribers, addNewBlog, deleteBlog, addNewEvent, deleteEvent, addNewCourse, deleteCourse };
+module.exports = { addPackage, deletePackage, updatePackage, getAllSubscribers, addNewBlog, deleteBlog, addNewEvent, deleteEvent, addNewCourse, deleteCourse, getStats };
