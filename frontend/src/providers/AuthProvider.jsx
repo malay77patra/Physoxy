@@ -13,6 +13,7 @@ const AuthProvider = ({ children }) => {
     const logoutUser = () => {
         setUser(null)
         localStorage.removeItem("user")
+        localStorage.removeItem("_authtk")
     }
 
     const setAuthToken = (token) => {

@@ -22,12 +22,7 @@ const loginSchema = yup
             .string()
             .trim()
             .required("Password is required")
-            .min(6, "Password must be at least 6 characters")
-            .max(64, "Password must be less than 64 characters")
-            .matches(
-                /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+]).{6,}$/,
-                "Password must contain at least one uppercase letter, one number, and one special character"
-            ),
+            
     })
     .required()
 

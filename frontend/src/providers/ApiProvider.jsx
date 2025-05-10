@@ -1,106 +1,133 @@
-import axios from "axios"
-import createAuthRefreshInterceptor from "axios-auth-refresh"
-import { createContext, useLayoutEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import React, { createContext, useMemo, useRef } from 'react'
+import axios from 'axios'
+import createAuthRefreshInterceptor from 'axios-auth-refresh'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/useAuth'
 
-const ApiContext = createContext(null)
+const serverURL = import.meta.env.VITE_SERVER_URL
+const refreshEndPoint = `${serverURL}/api/refresh`
+
+const ApiContext = createContext()
+
+const apiCallWrapper = async (apiCall) => {
+    try {
+        const response = await apiCall()
+        return { data: response.data, error: null }
+    } catch (error) {
+        return {
+            data: null,
+            error: {
+                message: error.response?.data?.message || error.message,
+                status: error.response?.status,
+            }
+        }
+    }
+}
 
 const ApiProvider = ({ children }) => {
     const navigate = useNavigate()
-    const serverURL = import.meta.env.VITE_SERVER_URL
-    const refreshEndPoint = `${serverURL}/api/refresh`
+    const { logoutUser } = useAuth()
 
-    const protectedApi = axios.create({
+    const refreshTokenPromise = useRef(null)
+
+    const axiosPublic = axios.create({
         baseURL: serverURL,
-        headers: { "Content-Type": "application/json" }
     })
 
-    const publicApi = axios.create({
+    const axiosProtected = axios.create({
         baseURL: serverURL,
-        headers: { "Content-Type": "application/json" }
     })
 
-    protectedApi.interceptors.request.use(
+    axiosPublic.defaults.withCredentials = true
+    axiosProtected.defaults.withCredentials = true
+
+    axiosProtected.interceptors.request.use(
         (config) => {
-            const token = localStorage.getItem("_authtk")
+            const token = localStorage.getItem('_authtk')
             if (token) {
-                config.headers["Authorization"] = `Bearer ${token}`
+                config.headers.Authorization = `Bearer ${token}`
             }
             return config
         },
         (error) => Promise.reject(error)
     )
 
-    const refreshAccessToken = async (failedRequest) => {
+    const refreshAuthLogic = async (failedRequest) => {
         try {
-            const res = await axios.post(refreshEndPoint, {}, { withCredentials: true })
-            const newToken = res.data.accessToken
+            if (!refreshTokenPromise.current) {
+                refreshTokenPromise.current = axios.post(
+                    refreshEndPoint,
+                    {},
+                    {
+                        withCredentials: true,
+                        skipAuthRefresh: true
+                    }
+                )
+                    .then(response => {
+                        const { accessToken } = response.data
+                        localStorage.setItem('_authtk', accessToken)
+                        return accessToken
+                    })
+                    .catch(error => {
+                        logoutUser()
+                        navigate("/login")
+                        return Promise.reject(error)
+                    })
+                    .finally(() => {
+                        refreshTokenPromise.current = null
+                    })
+            }
 
-            localStorage.setItem("_authtk", newToken)
+            const accessToken = await refreshTokenPromise.current
 
-            failedRequest.response.config.headers["Authorization"] = `Bearer ${newToken}`
+            failedRequest.response.config.headers.Authorization = `Bearer ${accessToken}`
+
             return Promise.resolve()
-        } catch (err) {
-            if (err?.response?.data?.redirect) {
-                localStorage.removeItem("_authtk")
-                localStorage.removeItem("user")
-                navigate("/login")
-                throw { response: { data: { message: "Please login" } } }
-            }
-            throw err
+        } catch (error) {
+            return Promise.reject(error)
         }
     }
 
-    useLayoutEffect(() => {
-        createAuthRefreshInterceptor(protectedApi, refreshAccessToken, {
-            shouldRefresh: (err) => {
-                return err.response?.data?.refresh
-            }
-        })
-    }, [])
+    createAuthRefreshInterceptor(axiosProtected, refreshAuthLogic, {
+        statusCodes: [401],
+        shouldRefresh: (error) => {
+            return !!error.response?.data?.refresh
+        }
+    })
 
-    const requestHandler = async (apiInstance, method, url, data = null, config = {}) => {
-        try {
-            const res = data
-                ? await apiInstance[method](url, data, config)
-                : await apiInstance[method](url, config)
-            return { data: res.data, error: null }
-        } catch (err) {
-            const message = err?.response?.data?.message || "Something went wrong."
-            const status = err?.response?.status
-            return {
-                data: null,
-                error: {
-                    message,
-                    status,
-                    details: err?.response?.data || null
-                }
-            }
+    const createApiMethods = (axiosInstance) => {
+        return {
+            get: (url, config) => apiCallWrapper(() => axiosInstance.get(url, config)),
+            post: (url, body, config) => apiCallWrapper(() => axiosInstance.post(url, body, config)),
+            put: (url, body, config) => apiCallWrapper(() => axiosInstance.put(url, body, config)),
+            patch: (url, body, config) => apiCallWrapper(() => axiosInstance.patch(url, body, config)),
+            delete: (url, config) => apiCallWrapper(() => axiosInstance.delete(url, config))
         }
     }
 
-    const protectedApiWrapper = {
-        get: (url, config) => requestHandler(protectedApi, "get", url, null, config),
-        post: (url, data, config) => requestHandler(protectedApi, "post", url, data, config),
-        put: (url, data, config) => requestHandler(protectedApi, "put", url, data, config),
-        delete: (url, config) => requestHandler(protectedApi, "delete", url, null, config),
-        patch: (url, data, config) => requestHandler(protectedApi, "patch", url, data, config)
-    }
+    const api = useMemo(() => ({
+        public: createApiMethods(axiosPublic),
+        protected: createApiMethods(axiosProtected),
 
-    const publicApiWrapper = {
-        get: (url, config) => requestHandler(publicApi, "get", url, null, config),
-        post: (url, data, config) => requestHandler(publicApi, "post", url, data, config),
-        put: (url, data, config) => requestHandler(publicApi, "put", url, data, config),
-        delete: (url, config) => requestHandler(publicApi, "delete", url, null, config),
-        patch: (url, data, config) => requestHandler(publicApi, "patch", url, data, config)
-    }
+        setAuthToken: (accessToken) => {
+            localStorage.setItem('_authtk', accessToken)
+        },
 
-    const apiServices = {
-        protected: protectedApiWrapper,
-        public: publicApiWrapper
-    }
+        clearAuthToken: () => {
+            localStorage.removeItem('_authtk')
+        },
 
-    return <ApiContext.Provider value={apiServices}>{children}</ApiContext.Provider>
+        isAuthenticated: () => {
+            return !!localStorage.getItem('_authtk')
+        }
+    }), [])
+
+    return (
+        <ApiContext.Provider value={api}>
+            {children}
+        </ApiContext.Provider>
+    )
 }
 
-export { ApiContext, ApiProvider }
+
+export { ApiProvider, ApiContext }

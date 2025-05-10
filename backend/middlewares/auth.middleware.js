@@ -32,19 +32,19 @@ const verifyAccessToken = async (req, res, next) => {
         if (error.name === "TokenExpiredError") {
             return res.status(401).json({
                 refresh: true,
-                message: "Refreshing session.",
+                message: "Session expired.",
                 details: "the access token has beed expired, refresh required"
             });
         } else if (error.name === "JsonWebTokenError") {
             return res.status(401).json({
                 refresh: true,
-                message: "Refreshing session.",
+                message: "Session expired.",
                 details: "invalid access token provided, refresh required"
             });
         } else if (error.name === "NotBeforeError") {
             return res.status(401).json({
                 refresh: true,
-                message: "Please wait.",
+                message: "Session is not active yet, please wait.",
                 details: "access token is not active yet"
             });
         }
