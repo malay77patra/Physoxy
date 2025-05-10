@@ -181,10 +181,59 @@ const getMyPackage = async (req, res) => {
 
 const getAllBlogs = async (req, res) => {
     const blogs = await Resource.find({ type: "blog" })
-    .select("-content -type")
-    .populate('plan', 'name');
+        .select("-content -type")
+        .populate('plan', 'name');
 
     return res.status(200).json(blogs);
 }
 
-module.exports = { refreshAccessToken, getAllPackages, updragePackage, getMyPackage, cancelPackage, getAllBlogs };
+const getBlog = async (req, res) => {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(400).json({
+            message: "Invalid blog ID",
+            details: "invalid blog id"
+        });
+    }
+
+    const blog = await Resource.findById(id)
+        .populate('plan', 'name description pricing.monthly');
+    if (!blog) {
+        return res.status(400).json({
+            message: "Blog not found.",
+            details: "blog not found"
+        });
+    }
+
+    if (blog.plan) {
+        if (!req.user.subscription) {
+            return res.status(200).json({
+                upgrade: true,
+                package: blog.plan,
+            });
+        }
+
+        const userPackage = await Package.findById(req.user.subscription.id);
+        if (!userPackage) {
+            return res.status(200).json({
+                upgrade: true,
+                package: blog.plan,
+            });
+        }
+
+        const blogPackagePrice = blog.plan.pricing.monthly;
+        const userPackagePrice = userPackage.pricing.monthly;
+
+        if (userPackagePrice < blogPackagePrice) {
+            return res.status(200).json({
+                upgrade: true,
+                package: blog.plan,
+            });
+        }
+    }
+
+    return res.status(200).send(blog);
+}
+
+module.exports = { refreshAccessToken, getAllPackages, updragePackage, getMyPackage, cancelPackage, getAllBlogs, getBlog };

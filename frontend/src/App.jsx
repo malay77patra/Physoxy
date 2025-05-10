@@ -6,6 +6,7 @@ import Register from '@/pages/Register'
 import Dashboard from '@/pages/Dashboard'
 import Pricing from '@/pages/Pricing'
 import Checkout from '@/pages/Checkout'
+import Blog from '@/pages/Blog'
 import DefaultLayout from '@/layouts/DefaultLayout'
 import GoBackLayout from '@/layouts/GoBackLayout'
 import AdminOnlyLayout from '@/layouts/AdminOnlyLayout'
@@ -25,6 +26,7 @@ export default function App() {
 
         <Route element={<AuthorizedLayout />}>
           <Route path="/checkout/:id" element={<Checkout />} />
+          <Route path="/blog/:id" element={<Blog />} />
         </Route>
 
         <Route element={<AdminOnlyLayout />}>

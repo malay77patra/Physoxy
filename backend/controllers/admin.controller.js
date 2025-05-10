@@ -120,7 +120,7 @@ const addNewBlog = async (req, res) => {
             });
         }
 
-        const plan = await Package.findById(req.body.plan);
+        plan = await Package.findById(req.body.plan);
         if (!plan) {
             return res.status(404).json({
                 message: "Package not found",
