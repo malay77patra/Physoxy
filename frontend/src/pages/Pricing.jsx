@@ -30,6 +30,7 @@ export default function Pricing() {
     const [pckages, setPackages] = useState([])
     const [myPackage, setMyPackage] = useState({})
     const [loading, setLoading] = useState(false)
+    const [cancelling, setCancelling] = useState(false)
     const activePackage = pckages.find(item => item._id === myPackage.id)
 
     const fetchPackages = async () => {
@@ -54,6 +55,22 @@ export default function Pricing() {
             toast.error(error.message)
         } else {
             setMyPackage(data)
+        }
+    }
+
+    const cancelMyPackage = async () => {
+        setCancelling(true)
+        try {
+            const { data, error } = await api.protected.delete("/api/package/cancel")
+            if (error) {
+                toast.error(error.message)
+            } else {
+                setMyPackage({})
+            }
+        } catch (err) {
+            toast.error(err.message)
+        } finally {
+            setCancelling(false)
         }
     }
 
@@ -89,6 +106,11 @@ export default function Pricing() {
                                         <p><label className="label">Amount:</label> ${myPackage.amount}</p>
                                         <p><label className="label">Started At:</label> {formatDate(myPackage.startsAt)}</p>
                                         <p><label className="label">Ending At:</label> {formatDate(myPackage.endsAt)}</p>
+                                        <div className="flex justify-end mt-2">
+                                            <button className="btn btn-error" disabled={cancelling} onClick={cancelMyPackage}>
+                                                {cancelling ? <span className="loading loading-spinner"></span> : "Cancel"}
+                                            </button>
+                                        </div>
                                     </>
                                 )}
                             </h2>
