@@ -1,6 +1,8 @@
 const Package = require("@/db/models/package");
 const User = require("@/db/models/user");
-const { packageSchema } = require("@/utils/validations");
+const Resource = require("@/db/models/resource");
+const { packageSchema, blogSchema } = require("@/utils/validations");
+const mongoose = require("mongoose");
 
 const addPackage = async (req, res) => {
     try {
@@ -108,5 +110,67 @@ const getAllSubscribers = async (req, res) => {
     return res.status(200).json(subscribers);
 }
 
+const addNewBlog = async (req, res) => {
+    let plan;
+    if (req.body.plan) {
+        if (!mongoose.isValidObjectId(req.body.plan)) {
+            return res.status(400).json({
+                message: "Invalid package ID",
+                details: "package id is not valid"
+            });
+        }
 
-module.exports = { addPackage, deletePackage, updatePackage, getAllSubscribers };
+        const plan = await Package.findById(req.body.plan);
+        if (!plan) {
+            return res.status(404).json({
+                message: "Package not found",
+                details: "package id is not found"
+            });
+        }
+    }
+
+    try {
+        const validatedData = await blogSchema.validate(req.body);
+        const newBlog = await Resource.create({
+            type: "blog",
+            title: validatedData.title,
+            content: validatedData.content,
+            plan: req.body.plan ? plan._id : undefined,
+        })
+
+        return res.status(200).json(newBlog);
+    } catch (error) {
+        if (error.name === "ValidationError") {
+            return res.status(400).json({
+                message: error.errors[0] || "Blog data is invalid.",
+                details: "provided blog data is invalid"
+            });
+        }
+
+        throw error;
+    }
+}
+
+const deleteBlog = async (req, res) => {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(400).json({
+            message: "Invalid blog ID",
+            details: "invalid blog id"
+        });
+    }
+
+    const deletedBlog = await Resource.findOneAndDelete({ _id: id });
+    if (!deleteBlog) {
+        return res.status(404).json({
+            message: "Blog not found",
+            details: "Blog id is not found"
+        });
+    }
+
+    return res.status(200).json(deleteBlog);
+}
+
+
+module.exports = { addPackage, deletePackage, updatePackage, getAllSubscribers, addNewBlog, deleteBlog };

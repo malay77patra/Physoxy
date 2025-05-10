@@ -26,6 +26,7 @@ export default function DefaultLayout() {
                                     <>
                                         <CollapsibleSidebarSubMenuItem onClick={() => navigate("/dashboard")}>Overview</CollapsibleSidebarSubMenuItem>
                                         <CollapsibleSidebarSubMenuItem onClick={() => navigate("/dashboard?tab=packages")}>Packages</CollapsibleSidebarSubMenuItem>
+                                        <CollapsibleSidebarSubMenuItem onClick={() => navigate("/dashboard?tab=blogs")}>Blogs</CollapsibleSidebarSubMenuItem>
                                     </>
                                 }>
                                     <TbLayoutDashboardFilled /> Dashboard

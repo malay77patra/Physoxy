@@ -146,7 +146,7 @@ export default function Packages() {
             </dialog>
 
             <div>
-                <h1 className="text-3xl font-bold">Packages</h1>
+                <h1 className="text-lg font-bold">Packages</h1>
                 <div className="flex justify-end">
                     <button className="btn btn-success" onClick={() => setModalOpen(true)}>
                         <FaPlus /> Add New

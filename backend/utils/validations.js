@@ -1,7 +1,21 @@
 const { object, string, number } = require("yup");
 
+const blogSchema = object({
+    plan: string()
+        .trim(),
+    title: string()
+        .trim()
+        .required("Title is required")
+        .min(3, "Title must be at least 3 characters")
+        .max(100, "Title must be less than 100 characters"),
+    content: string()
+        .trim()
+        .required("Content is required")
+        .min(10, "Content must be at least 10 characters")
+        .max(5000, "Content must be less than 5000 characters")
+}).strict().required("Blog details are required")
+
 const upgradePlanSchema = object({
-    // type must be "monthly" or "yearly"
     type: string()
         .trim()
         .required("Subscription type is required")
@@ -70,4 +84,5 @@ module.exports = {
     registerSchema,
     packageSchema,
     upgradePlanSchema,
+    blogSchema,
 };

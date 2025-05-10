@@ -1,8 +1,8 @@
 require("dotenv").config();
 const User = require("@/db/models/user");
 const Package = require("@/db/models/package");
+const Resource = require("@/db/models/resource");
 const jwt = require("jsonwebtoken");
-const { Schema, ref } = require("yup");
 const mongoose = require("mongoose");
 const { upgradePlanSchema } = require("@/utils/validations");
 
@@ -179,4 +179,12 @@ const getMyPackage = async (req, res) => {
     return res.status(200).json({});
 };
 
-module.exports = { refreshAccessToken, getAllPackages, updragePackage, getMyPackage, cancelPackage };
+const getAllBlogs = async (req, res) => {
+    const blogs = await Resource.find({ type: "blog" })
+    .select("-content -type")
+    .populate('plan', 'name');
+
+    return res.status(200).json(blogs);
+}
+
+module.exports = { refreshAccessToken, getAllPackages, updragePackage, getMyPackage, cancelPackage, getAllBlogs };

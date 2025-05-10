@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { refreshAccessToken, getAllPackages, updragePackage, getMyPackage, cancelPackage } = require("@/controllers/user.controller");
+const { refreshAccessToken, getAllPackages, updragePackage, getMyPackage, cancelPackage, getAllBlogs } = require("@/controllers/user.controller");
 const { verifyAccessToken } = require("@/middlewares/auth.middleware");
 
 const router = Router();
@@ -8,6 +8,7 @@ const router = Router();
 
 router.post("/refresh", refreshAccessToken);
 router.get("/package/all", getAllPackages);
+router.get("/blog/all", getAllBlogs);
 
 // ---------------------- Protected Routes ----------------------
 router.post("/package/upgrade/:id", verifyAccessToken, updragePackage);
