@@ -26,7 +26,7 @@ Supports both light and dark themes with user preference persistence for an enha
 
 ### 💼 User Plans
 
-Offers tiered user plans (e.g., free, premium) with customizable access to features and services depending on the selected plan. Includes upgrade/downgrade support and plan validation via middleware.
+Offers tiered user plans (e.g., free, premium) with customizable access to features and services depending on the selected plan. Includes upgrade/downgrade support and plan validation.
 
 ### 📧 Email Verification
 
@@ -42,7 +42,7 @@ Implements secure login with access and refresh tokens, allowing persistent sess
 
 ### 🛡️ Role-Based Resource Access
 
-Granular access control based on user roles (e.g., user, admin, moderator). Routes and components are protected through middleware and client-side guards to prevent unauthorized access.
+Granular access control based on user roles (e.g., user, admin). Routes and components are protected through middleware and client-side layouts to prevent unauthorized access.
 
 ---
 
