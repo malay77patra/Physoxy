@@ -46,7 +46,7 @@ export default function Home() {
                 </div>
             </div>
 
-            <footer className="mt-24 bg-base-200 p-10 text-base-content">
+            <footer className="mt-24 bg-base-200 p-10 text-base-content rounded-box">
                 <div className="footer flex flex-col md:flex-row justify-between">
                     <div>
                         <span className="footer-title">Physoxy</span>
