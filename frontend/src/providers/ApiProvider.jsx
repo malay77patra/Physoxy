@@ -69,8 +69,12 @@ const ApiProvider = ({ children }) => {
                         return accessToken
                     })
                     .catch(error => {
-                        logoutUser()
-                        navigate("/login")
+                        if (error.response?.data?.redirect) {
+                            console.log(error)
+                            logoutUser()
+                            navigate("/login", { replace: true })
+                            return Promise.reject({ message: "Session expired." })
+                        }
                         return Promise.reject(error)
                     })
                     .finally(() => {

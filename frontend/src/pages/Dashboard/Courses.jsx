@@ -1,27 +1,27 @@
-import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useApi } from "@/hooks/useApi";
-import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
-import { FaPlus } from "react-icons/fa";
+import { useEffect, useRef, useState } from "react"
+import { useForm } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
+import { useApi } from "@/hooks/useApi"
+import toast from "react-hot-toast"
+import { Link } from "react-router-dom"
+import { FaPlus } from "react-icons/fa"
 
 const courseSchema = yup.object({
     title: yup.string().trim().required("Title is required").min(3, "Title must be at least 3 characters"),
     content: yup.string().trim().required("Content is required").min(10, "Content must be at least 10 characters"),
-}).required();
+}).required()
 
 export default function Courses() {
-    const api = useApi();
-    const newCourseRef = useRef(null);
-    const [newCourseOpen, setNewCourseOpen] = useState(false);
-    const [adding, setAdding] = useState(false);
-    const [courses, setCourses] = useState([]);
-    const [packages, setPackages] = useState([]);
-    const [loadingPkgs, setLoadingPkgs] = useState(true);
-    const [loading, setLoading] = useState(true);
-    const [deletingCourseId, setDeletingCourseId] = useState(null);
+    const api = useApi()
+    const newCourseRef = useRef(null)
+    const [newCourseOpen, setNewCourseOpen] = useState(false)
+    const [adding, setAdding] = useState(false)
+    const [courses, setCourses] = useState([])
+    const [packages, setPackages] = useState([])
+    const [loadingPkgs, setLoadingPkgs] = useState(true)
+    const [loading, setLoading] = useState(true)
+    const [deletingCourseId, setDeletingCourseId] = useState(null)
 
     const {
         register,
@@ -30,110 +30,111 @@ export default function Courses() {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(courseSchema),
-    });
+    })
 
     const fetchCourses = async () => {
-        setLoading(true);
+        setLoading(true)
         try {
-            const { error, data } = await api.public.get("/api/course/all");
+            const { error, data } = await api.public.get("/api/course/all")
             if (error) {
-                toast.error(error.message);
+                toast.error(error.message)
             } else {
-                setCourses(data);
+                setCourses(data)
             }
         } catch (err) {
-            toast.error("Something went wrong");
+            toast.error("Something went wrong")
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
+    }
 
     const fetchPackages = async () => {
-        setLoadingPkgs(true);
+        setLoadingPkgs(true)
         try {
-            const { data, error } = await api.public.get("/api/package/all");
+            const { data, error } = await api.public.get("/api/package/all")
             if (error) {
-                toast.error(error.message);
+                toast.error(error.message)
             } else {
-                setPackages(data);
+                setPackages(data)
             }
         } catch (error) {
-            toast.error("Something went wrong!");
+            toast.error("Something went wrong!")
         } finally {
-            setLoadingPkgs(false);
+            setLoadingPkgs(false)
         }
-    };
+    }
 
     const addNewCourse = async (formData) => {
-        setAdding(true);
+        setAdding(true)
         try {
-            formData.type = "course";
-            const { error, data } = await api.protected.post("/api/course/new", formData);
+            formData.type = "course"
+            const { error, data } = await api.protected.post("/api/course/new", formData)
+            const coursePkg = packages.find(pkg => pkg._id === formData.plan)
             if (error) {
-                toast.error(error.message);
+                toast.error(error.message)
             } else {
-                setCourses((prev) => [...prev, data]);
-                reset();
-                setNewCourseOpen(false);
+                setCourses((prev) => [...prev, { ...data, plan: coursePkg }])
+                reset()
+                setNewCourseOpen(false)
             }
         } catch {
-            toast.error("Something went wrong");
+            toast.error("Something went wrong")
         } finally {
-            setAdding(false);
+            setAdding(false)
         }
-    };
+    }
 
     const deleteCourse = async (courseId) => {
-        setDeletingCourseId(courseId);
+        setDeletingCourseId(courseId)
         try {
-            const { error } = await api.protected.delete(`/api/course/delete/${courseId}`);
+            const { error } = await api.protected.delete(`/api/course/delete/${courseId}`)
             if (error) {
-                toast.error(error.message);
+                toast.error(error.message)
             } else {
-                setCourses((prev) => prev.filter((c) => c._id !== courseId));
-                toast.success("Deleted!");
+                setCourses((prev) => prev.filter((c) => c._id !== courseId))
+                toast.success("Deleted!")
             }
         } catch {
-            toast.error("Something went wrong");
+            toast.error("Something went wrong")
         } finally {
-            setDeletingCourseId(null);
+            setDeletingCourseId(null)
         }
-    };
+    }
 
     useEffect(() => {
-        fetchCourses();
-        fetchPackages();
-    }, []);
+        fetchCourses()
+        fetchPackages()
+    }, [])
 
     useEffect(() => {
-        const modal = newCourseRef.current;
-        if (!modal) return;
+        const modal = newCourseRef.current
+        if (!modal) return
 
         if (newCourseOpen) {
-            if (!modal.open) modal.showModal();
+            if (!modal.open) modal.showModal()
         } else {
-            if (modal.open) modal.close();
+            if (modal.open) modal.close()
         }
-    }, [newCourseOpen]);
+    }, [newCourseOpen])
 
     useEffect(() => {
-        const modal = newCourseRef.current;
-        if (!modal) return;
+        const modal = newCourseRef.current
+        if (!modal) return
 
-        const handleClose = () => setNewCourseOpen(false);
-        modal.addEventListener("close", handleClose);
+        const handleClose = () => setNewCourseOpen(false)
+        modal.addEventListener("close", handleClose)
 
         return () => {
-            modal.removeEventListener("close", handleClose);
-        };
-    }, []);
+            modal.removeEventListener("close", handleClose)
+        }
+    }, [])
 
     if (loading || loadingPkgs) {
         return (
             <div className="p-4 flex justify-center">
                 <span className="loading loading-spinner"></span>
             </div>
-        );
+        )
     }
 
     return (
@@ -220,5 +221,5 @@ export default function Courses() {
                 ))}
             </div>
         </div>
-    );
+    )
 }

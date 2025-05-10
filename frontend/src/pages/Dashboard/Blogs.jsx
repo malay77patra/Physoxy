@@ -39,7 +39,6 @@ export default function Blogs() {
             if (error) {
                 toast.error(error.message)
             } else {
-                console.log(data)
                 setBlogs(data)
             }
         } catch (err) {
@@ -70,10 +69,11 @@ export default function Blogs() {
         try {
             formData.type = "blog"
             const { error, data } = await api.protected.post("/api/blog/new", formData)
+            const blogPkg = packages.find(pkg => pkg._id === formData.plan)
             if (error) {
                 toast.error(error.message)
             } else {
-                setBlogs(prev => [...prev, data])
+                setBlogs(prev => [...prev, { ...data, plan: blogPkg }])
                 reset()
                 setNewBlogOpen(false)
             }

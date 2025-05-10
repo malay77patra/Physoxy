@@ -69,10 +69,11 @@ export default function Events() {
         try {
             formData.type = "event"
             const { error, data } = await api.protected.post("/api/event/new", formData)
+            const eventPkg = packages.find(pkg => pkg._id === formData.plan)
             if (error) {
                 toast.error(error.message)
             } else {
-                setEvents(prev => [...prev, data])
+                setEvents(prev => [...prev, { ...data, plan: eventPkg }])
                 reset()
                 setNewEventOpen(false)
             }
