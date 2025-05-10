@@ -79,4 +79,9 @@ npm install
 npm run dev
 ```
 
+## Test Users
+Login with the below credentials to test the web app -
+- malay77patra@gmail.com, Test@1234 (admin)
+- 280shanna@chefalicious.com, Shan@1234
+
 Visit the app at [http://localhost:5147](http://localhost:5147)
